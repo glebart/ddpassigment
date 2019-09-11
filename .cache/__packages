@@ -1,0 +1,10 @@
+base
+data.table
+magrittr
+XML
+bitops
+RCurl
+rlist
+ggplot2
+plotly
+leaflet
