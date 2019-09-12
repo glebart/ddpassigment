@@ -8,3 +8,6 @@ rlist
 ggplot2
 plotly
 leaflet
+sp
+maps
+maptools

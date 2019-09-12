@@ -1,62 +1,55 @@
 ---
-title       : DDP course project
-subtitle    : shiny with leaflet
-author      : me
-job         : ---
-framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+title       : Pitch for shiny app
+subtitle    : Reactive leaflet map in Shiny
+author      : Me
+job         : sep 2019
+framework   : io2012       # {io2012, html5slides, shower, dzslides, ...}
 highlighter : highlight.js  # {highlight.js, prettify, highlight}
 hitheme     : tomorrow      # 
-widgets     : []            # {mathjax, quiz, bootstrap}
+widgets     : [bootstrap]            # {mathjax, quiz, bootstrap}
 mode        : selfcontained # {standalone, draft}
 knit        : slidify::knit2slides
-github:
-  user: glebart
-  repo: ddpassigment
 ---
 
-## Read-And-Delete
 
-1. Edit YAML front matter
-2. Write using R Markdown
-3. Use an empty line followed by three dashes to separate slides!
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+```
+## About shiny app
+
+Shiny app has 2 tabs: **About**, **Leaflet Updates**. 
+
+* **About** is just simple description text.
+* On **Leaflet Updates** you can find a interactive map with 2 single choice inputs. Map will be recolored depending on those. 
+* Controls: 
+  + First input: a choice between different death types 
+  + Second input: a slider with number of colors. 
+                             It controls the number of split groups to color countries.
+* Hovering on colored county will show its name and deaths count of selected type.
+* Inputs are reactive, but map is kinda slow. Please have a patience;)
 
 --- .class #id 
 
 
-## List of countries by intentional death rate.
-
-You will find here an interactive map for yearly intentional deaths per capita according to a Wiki page: [link](https://en.wikipedia.org/wiki/List_of_countries_by_intentional_death_rate).
-
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+## Data
+Data used: yearly intentional deaths per capita according to a Wiki page: [link](https://en.wikipedia.org/wiki/List_of_countries_by_intentional_death_rate).
+```{r ,echo=FALSE,warning=FALSE}
 library(data.table)
-library(magrittr)
 library(XML)
 library(RCurl)
 library(rlist)
-library(plotly)
+library(data.table)
+library(magrittr)
+library(sp)
+library(maps)
+library(maptools)
 library(leaflet)
 options(stringsAsFactors = F)
-```
-
-## List of countries by intentional death rate.
-
-You will find here an interactive map for yearly intentional deaths per capita according to a Wiki page: [link](https://en.wikipedia.org/wiki/List_of_countries_by_intentional_death_rate).
-
----
-
-## Intetional deaths a year per 100 000 inhabits
-
-```{r ,echo=FALSE,warning=FALSE}
-
-#getting data
 theurl <- getURL("https://en.wikipedia.org/wiki/List_of_countries_by_intentional_death_rate",.opts = list(ssl.verifypeer = FALSE) )
 tables <- readHTMLTable(theurl,header = T)
 tables <- list.clean(tables, fun = is.null, recursive = FALSE)
 idpcpy = tables[[1]]
-
 #formating 
 idpcpy %>% setDT()
 names(idpcpy) %<>% gsub("[+[(].*","",.) %>% tolower() %>%  trimws()
@@ -67,21 +60,77 @@ for (j in cols){
   set(idpcpy,i=NULL, j=j, value = as.numeric(idpcpy[[j]])  )
 }
 idpcpy = idpcpy[!is.na(ratio)]
-bins <- c(0, 5, 10, 20, 30, 40, Inf)
-pal <- colorBin("YlOrRd", domain = idpcpy$`intentional death`, bins = bins)
-
-p <- plot_ly(
-  idpcpy, x = ~suicide, y = ~homicide,
-  type ="scatter",
-  mode = "markers",
-  size = ~`intentional death`,
-  # Hover text:
-  text = ~paste("Country ", country, '<br>Rank:', rank, '<br>Intentional deaths:', `intentional death`),
-  color = ~`intentional death`, colors = colorRamp(c("green", "red"))
-)
-p
+```
+```{r ,warning=FALSE}
+#data are scraped from web
+#here how it looks after some cleaning
+head(idpcpy)
 ```
 
----
+--- .class #id
 
-## Thank you.
+
+## Example
+
+### Intetional deaths a year per 100 000 inhabits
+Slidify seems to leave only image of a map. In app it is interactive.
+
+```{r ,echo=FALSE,warning=FALSE}
+
+bins <- c(0, 5, 10, 20, 30, 40, Inf)
+pal <- colorBin("YlOrRd", domain = idpcpy$`intentional death`, bins = bins)
+  #getting spatial data for countries
+  world <- map("world", fill=TRUE, plot=FALSE)
+  world_map <- map2SpatialPolygons(world, sub(":.*$", "", world$names))
+  world_map <- SpatialPolygonsDataFrame(world_map,
+                                        data.frame(country=names(world_map), 
+                                                   stringsAsFactors=FALSE), 
+                                        FALSE)
+  
+  # countries with different spellings in each dataset
+  #idpcpy$Country[!(idpcpy$Country %in% world_map$country)]
+  
+  #ok those are big ones
+  idpcpy$country %<>% gsub("United States","USA",.) %>% gsub("United Kingdom","UK",.)
+  #reorder data so orders in spatial data in data with numbers were the same
+  #for proper labeling
+target <- subset(world_map, country %in% idpcpy$country)
+idpcpy[,cntry:=tolower(country)]
+setorder(idpcpy,cntry)
+idpcpySub <- idpcpy[ country %in% target$country,]
+
+#Making map
+labels <- sprintf(
+  "<strong>%s<br/>Rank %s</strong><br/>%g deaths per 100k inhabitats</sup>",
+  idpcpySub$country,idpcpySub$rank, idpcpySub$intentional
+) %>% lapply(htmltools::HTML)
+
+leaf =leaflet(target) %>% 
+  addTiles() %>% 
+addPolygons(
+  fillColor = ~pal(idpcpySub$intentional),
+  weight = 2,
+  opacity = 1,
+  color = "white",
+  dashArray = "3",
+  fillOpacity = 0.7,
+  highlight = highlightOptions(
+    weight = 5,
+    color = "#666",
+    dashArray = "",
+    fillOpacity = 0.7,
+    bringToFront = TRUE),
+  label = labels,
+  labelOptions = labelOptions(
+    style = list("font-weight" = "normal", padding = "3px 8px"),
+    textsize = "15px",
+    direction = "auto")) %>%
+  addLegend(pal = pal, values = ~idpcpySub$intentional, opacity = 0.7, title = "Cases per 100,000<br/>inhabitats per year",
+            position = "bottomright")
+#code is kinda big for presentation. sorry)
+leaf
+```
+
+--- .class #id
+
+## Thank you

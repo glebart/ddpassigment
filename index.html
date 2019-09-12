@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>DDP course project</title>
+  <title>Pitch for shiny app</title>
   <meta charset="utf-8">
-  <meta name="description" content="DDP course project">
-  <meta name="author" content="me">
+  <meta name="description" content="Pitch for shiny app">
+  <meta name="author" content="Me">
   <meta name="generator" content="slidify" />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta http-equiv="X-UA-Compatible" content="chrome=1">
@@ -13,7 +13,8 @@
     media="only screen and (max-device-width: 480px)" >
   <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
   <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
-  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="libraries/widgets/bootstrap/css/bootstrap.css"></link>
+<link rel=stylesheet href="./assets/css/ribbons.css"></link>
 
   
   <!-- Grab CDN jQuery, fall back to local if offline -->
@@ -33,14 +34,10 @@
         <slide class="title-slide segue nobackground">
   
   <hgroup class="auto-fadein">
-    <h1>DDP course project</h1>
-    <h2>shiny with leaflet</h2>
-    <p>me<br/>---</p>
+    <h1>Pitch for shiny app</h1>
+    <h2>Reactive leaflet map in Shiny</h2>
+    <p>Me<br/>sep 2019</p>
   </hgroup>
-  
-    <a href="https://github.com/glebart/ddpassigment/zipball/gh-pages" class="example">
-     Download
-    </a>
   
   <article></article>  
   
@@ -51,15 +48,25 @@
     <slide class="" id="slide-1" style="background:;">
   
   <hgroup>
-    <h2>Read-And-Delete</h2>
+    <h2>About shiny app</h2>
   </hgroup>
   
   <article data-timings="">
-    <ol>
-<li>Edit YAML front matter</li>
-<li>Write using R Markdown</li>
-<li>Use an empty line followed by three dashes to separate slides!</li>
-</ol>
+    <p>Shiny app has 2 tabs: <strong>About</strong>, <strong>Leaflet Updates</strong>. </p>
+
+<ul>
+<li><strong>About</strong> is just simple description text.</li>
+<li>On <strong>Leaflet Updates</strong> you can find a interactive map with 2 single choice inputs. Map will be recolored depending on those. </li>
+<li>Controls: 
+
+<ul>
+<li>First input: a choice between different death types </li>
+<li>Second input: a slider with number of colors. 
+                     It controls the number of split groups to color countries.</li>
+</ul></li>
+<li>Hovering on colored county will show its name and deaths count of selected type.</li>
+<li>Inputs are reactive, but map is kinda slow. Please have a patience;)</li>
+</ul>
 
   </article>
   <!-- Presenter Notes -->
@@ -69,42 +76,24 @@
 <slide class="class" id="id" style="background:;">
   
   <hgroup>
-    <h2>List of countries by intentional death rate.</h2>
+    <h2>Data</h2>
   </hgroup>
   
   <article data-timings="">
-    <p>You will find here an interactive map for yearly intentional deaths per capita according to a Wiki page: <a href="https://en.wikipedia.org/wiki/List_of_countries_by_intentional_death_rate">link</a>.</p>
+    <p>Data used: yearly intentional deaths per capita according to a Wiki page: <a href="https://en.wikipedia.org/wiki/List_of_countries_by_intentional_death_rate">link</a>.</p>
 
-  </article>
-  <!-- Presenter Notes -->
-  
-</slide>
-
-<slide class="" id="slide-3" style="background:;">
-  
-  <hgroup>
-    <h2>List of countries by intentional death rate.</h2>
-  </hgroup>
-  
-  <article data-timings="">
-    <p>You will find here an interactive map for yearly intentional deaths per capita according to a Wiki page: <a href="https://en.wikipedia.org/wiki/List_of_countries_by_intentional_death_rate">link</a>.</p>
-
-  </article>
-  <!-- Presenter Notes -->
-  
-</slide>
-
-<slide class="" id="slide-4" style="background:;">
-  
-  <hgroup>
-    <h2>Intetional deaths a year per 100 000 inhabits</h2>
-  </hgroup>
-  
-  <article data-timings="">
-    <pre><code>## PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.
+<pre><code class="r">#data are scraped from web
+#here how it looks after some cleaning
+head(idpcpy)
 </code></pre>
 
-<pre><code>## Error in file(con, &quot;rb&quot;): cannot open the connection
+<pre><code>##    rank               country homicide suicide intentional death ratio
+## 1:  108                 Egypt      3.4     0.1               3.5 34.00
+## 2:  107              Maldives      3.9     0.3               4.2 13.00
+## 3:  106                 Syria      2.3     0.1               2.4 23.00
+## 4:  105 S<U+0413><U+0408>o Tom<U+0413>© and Pr<U+0413>­ncipe      1.9     0.9               2.8  2.11
+## 5:  104            Azerbaijan      2.1     0.6               2.8  3.50
+## 6:  103                Jordan      2.0     1.1               2.9  1.82
 </code></pre>
 
   </article>
@@ -112,10 +101,28 @@
   
 </slide>
 
-<slide class="" id="slide-5" style="background:;">
+<slide class="class" id="id" style="background:;">
   
   <hgroup>
-    <h2>Thank you.</h2>
+    <h2>Example</h2>
+  </hgroup>
+  
+  <article data-timings="">
+    <h3>Intetional deaths a year per 100 000 inhabits</h3>
+
+<p>Slidify seem to leave only image of a map. In app it is interactive.</p>
+
+<p><img src="assets/fig/unnamed-chunk-3-1.png" alt="plot of chunk unnamed-chunk-3"></p>
+
+  </article>
+  <!-- Presenter Notes -->
+  
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  
+  <hgroup>
+    <h2>Thank you</h2>
   </hgroup>
   
   <article data-timings="">
@@ -132,36 +139,29 @@
       
     <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=1 title='Read-And-Delete'>
+        data-slide=1 title='About shiny app'>
          1
       </a>
     </li>
     
     <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=2 title='List of countries by intentional death rate.'>
+        data-slide=2 title='Data'>
          2
       </a>
     </li>
     
     <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=3 title='List of countries by intentional death rate.'>
+        data-slide=3 title='Example'>
          3
       </a>
     </li>
     
     <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=4 title='Intetional deaths a year per 100 000 inhabits'>
+        data-slide=4 title='Thank you'>
          4
-      </a>
-    </li>
-    
-    <li>
-      <a href="#" target="_self" rel='tooltip' 
-        data-slide=5 title='Thank you.'>
-         5
       </a>
     </li>
     
@@ -174,7 +174,15 @@
   <![endif]-->
 </body>
   <!-- Load Javascripts for Widgets -->
-  
+  <script src="libraries/widgets/bootstrap/js/bootstrap.min.js"></script>
+<script src="libraries/widgets/bootstrap/js/bootbox.min.js"></script>
+
+  <script>  
+  $(function (){ 
+    $("#example").popover(); 
+    $("[rel='tooltip']").tooltip(); 
+  });  
+  </script>  
   <!-- LOAD HIGHLIGHTER JS FILES -->
   <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
   <script>hljs.initHighlightingOnLoad();</script>
